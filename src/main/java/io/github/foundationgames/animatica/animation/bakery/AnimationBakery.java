@@ -64,7 +64,11 @@ public class AnimationBakery {
             Phase phase;
             for (var anim : anims) {
                 phase = anim.getCurrentPhase();
-                TextureUtil.copy(anim.source, 0, phase.v(), anim.width, anim.height, frameImg, anim.targetX, anim.targetY, phase.blend().getBlend(anim.getPhaseFrame()));
+                if (phase instanceof InterpolatedPhase iPhase) {
+                    TextureUtil.blendCopy(anim.source, 0, iPhase.prevV, 0, iPhase.v, anim.width, anim.height, frameImg, anim.targetX, anim.targetY, iPhase.blend.getBlend(anim.getPhaseFrame()));
+                } else {
+                    TextureUtil.copy(anim.source, 0, phase.v, anim.width, anim.height, frameImg, anim.targetX, anim.targetY);
+                }
             }
 
             var id = new Identifier(targetTexId.getNamespace(), targetTexId.getPath() + ".anim" + frameIds.size());
@@ -119,6 +123,7 @@ public class AnimationBakery {
 
             final int frames = (int)Math.floor((float)source.getHeight() / meta.height());
 
+            int prevV = ((frames - 1) - meta.frameMapping().getOrDefault(frames - 1, frames - 1)) * meta.height(); // Initialize with the last frame in the animation
             for (int f = 0; f < frames; f++) {
                 int fDuration = meta.frameDurations().getOrDefault(f, meta.defaultFrameDuration());
                 int fMap = meta.frameMapping().getOrDefault(f, f);
@@ -128,24 +133,20 @@ public class AnimationBakery {
                 if (meta.interpolate()) {
                     // Handles adding interpolated animation phases
                     final int interpolatedDuration = fDuration - meta.interpolationDelay();
-                    phaseBuilder.add(new Phase(
-                            true, interpolatedDuration,
-                            v, (phaseFrame) -> 1f - ((float) phaseFrame / interpolatedDuration)
-                    ));
+                    phaseBuilder.add(new InterpolatedPhase(interpolatedDuration, v, prevV, (phaseFrame) -> ((float) phaseFrame / interpolatedDuration)));
                     duration += interpolatedDuration;
 
                     if (meta.interpolationDelay() > 0) {
                         // Adds a static version of the current phase as a "delay" before the next interpolated phase (if specified in animation)
-                        phaseBuilder.add(new Phase(
-                                false, meta.interpolationDelay(),
-                                v, BlendInterpolator.STATIC
-                        ));
+                        phaseBuilder.add(new Phase(meta.interpolationDelay(), v));
                         duration += meta.interpolationDelay();
                     }
                 } else {
-                    phaseBuilder.add(new Phase(false, fDuration, v, BlendInterpolator.STATIC));
+                    phaseBuilder.add(new Phase(fDuration, v));
                     duration += fDuration;
                 }
+
+                prevV = v;
             }
 
             this.duration = duration;
@@ -165,7 +166,7 @@ public class AnimationBakery {
                         // Marks baking anim as changed should it be in a new phase
                         changed = true;
                     }
-                    if (phase.changing) changed = true; // Marks baking anim as changed should its current phase be a changing one
+                    if (phase instanceof InterpolatedPhase) changed = true; // Marks baking anim as changed should its current phase be a changing one
 
                     this.currentPhase = phase;
                     this.phaseFrame = phase.duration + progress; // Adding progress to the phase duration results in how far it is into the phase
@@ -200,14 +201,29 @@ public class AnimationBakery {
         }
     }
 
-    public record Phase(
-        boolean changing, int duration,
-        int v, BlendInterpolator blend
-    ) {}
+    public static class Phase {
+        public final int duration;
+        public final int v;
 
+        public Phase(int duration, int v) {
+            this.duration = duration;
+            this.v = v;
+        }
+    }
+
+    public static class InterpolatedPhase extends Phase {
+        public final int prevV;
+        public final BlendInterpolator blend;
+
+        public InterpolatedPhase(int duration, int v, int prevV, BlendInterpolator blend) {
+            super(duration, v);
+            this.prevV = prevV;
+            this.blend = blend;
+        }
+    }
+
+    @FunctionalInterface
     public interface BlendInterpolator {
-        BlendInterpolator STATIC = f -> 0;
-
         float getBlend(int phaseFrame);
     }
 }
