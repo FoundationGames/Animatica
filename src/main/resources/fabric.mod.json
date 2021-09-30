@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "animatica",
+  "version": "${version}",
+
+  "name": "Animatica",
+  "description": "Allow for animating more game textures using the MCPatcher/OptiFine animation format",
+  "authors": [
+    "FoundationGames"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+  "license": "LGPLv3",
+  "icon": "assets/animatica/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "io.github.foundationgames.animatica.Animatica"
+    ]
+  },
+  "mixins": [
+    "animatica.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  }
+}

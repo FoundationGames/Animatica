@@ -1,0 +1,2 @@
+# Animatica
+A Minecraft mod for the Fabric mod loader intended to load the MCPatcher/OptiFine [animated texture format](https://github.com/sp614x/optifine/blob/master/OptiFineDoc/doc/custom_animations.txt)
