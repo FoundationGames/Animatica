@@ -4,12 +4,11 @@
   "package": "io.github.foundationgames.animatica.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "RenderSystemMixin"
+    "RenderSystemMixin",
+    "IdentifierMixin",
+    "VideoOptionsScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "IdentifierMixin"
-  ]
+  }
 }

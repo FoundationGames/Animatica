@@ -26,7 +26,7 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
     private AnimationLoader() {
     }
 
-    private static void iterateAnimResources(ResourceManager manager, Consumer<Identifier> action) {
+    private static void findAllMCPAnimations(ResourceManager manager, Consumer<Identifier> action) {
         for (var path : ANIM_PATHS) {
             manager.findResources(path, p -> p.endsWith(".properties")).forEach(action);
         }
@@ -43,13 +43,17 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
 
     @Override
     public void reload(ResourceManager manager) {
+        if (!Animatica.CONFIG.animatedTextures) {
+            this.animatedTextures.clear();
+            return;
+        }
+
         Flags.ALLOW_INVALID_ID_CHARS = true;
 
         this.animatedTextures.clear();
         var animations = new HashMap<Identifier, List<AnimationMeta>>();
 
-        iterateAnimResources(manager, id -> {
-            // Animatica.LOG.info("Loading animation "+id);
+        findAllMCPAnimations(manager, id -> {
             try {
                 try (var resource = manager.getResource(id).getInputStream()) {
                     var ppt = new Properties();

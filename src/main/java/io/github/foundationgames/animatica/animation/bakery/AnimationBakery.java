@@ -125,8 +125,8 @@ public class AnimationBakery {
 
             int prevV = ((frames - 1) - meta.frameMapping().getOrDefault(frames - 1, frames - 1)) * meta.height(); // Initialize with the last frame in the animation
             for (int f = 0; f < frames; f++) {
-                int fDuration = meta.frameDurations().getOrDefault(f, meta.defaultFrameDuration());
                 int fMap = meta.frameMapping().getOrDefault(f, f);
+                int fDuration = meta.frameDurations().getOrDefault(fMap, meta.defaultFrameDuration());
 
                 int v = ((frames - 1) - fMap) * meta.height(); // Reverses the frame number so that frames will be from top to bottom (rather than bottom to top)
 

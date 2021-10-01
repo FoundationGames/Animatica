@@ -1,6 +1,7 @@
 package io.github.foundationgames.animatica;
 
 import io.github.foundationgames.animatica.animation.AnimationLoader;
+import io.github.foundationgames.animatica.config.AnimaticaConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -12,6 +13,8 @@ import org.apache.logging.log4j.Logger;
 public class Animatica implements ClientModInitializer {
     public static final Logger LOG = LogManager.getLogger("Animatica");
     public static final String NAMESPACE = "animatica";
+
+    public static final AnimaticaConfig CONFIG = new AnimaticaConfig();
 
     private static long time = 0;
 
