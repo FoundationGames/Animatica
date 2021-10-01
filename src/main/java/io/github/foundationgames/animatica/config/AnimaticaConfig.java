@@ -12,11 +12,17 @@ import java.util.Properties;
 
 public class AnimaticaConfig {
     public boolean animatedTextures;
+    public Integer maxAnimFrames;
 
     public static String ANIMATED_TEXTURES_KEY = "animated_textures";
+    public static String MAX_ANIM_FRAMES_KEY = "max_animation_frames";
 
     public static final String FILE_NAME = "animatica.properties";
-    public static final String COMMENT = "Configuration file for Animatica";
+    public static final String[] COMMENTS = {
+            "Configuration file for Animatica",
+            "animated_textures=<true|false> - Determines whether custom texture animation support should be enabled or not",
+            "max_animation_frames=<integer value, or 'none'> - Maximum unique animation frames a texture can have, to prevent high RAM/VRAM usage (disabled when set to 'none')"
+    };
 
     public static final CyclingOption<Boolean> ANIMATED_TEXTURES_OPTION = CyclingOption.create("option.animatica.animated_textures", opts -> {
         try {
@@ -41,10 +47,12 @@ public class AnimaticaConfig {
 
     public void writeTo(Properties properties) {
         properties.put(ANIMATED_TEXTURES_KEY, Boolean.toString(animatedTextures));
+        properties.put(MAX_ANIM_FRAMES_KEY, maxAnimFrames == null ? "none" : maxAnimFrames.toString());
     }
 
     public void readFrom(Properties properties) {
         this.animatedTextures = boolFrom(properties.getProperty(ANIMATED_TEXTURES_KEY), true);
+        this.maxAnimFrames = nullableIntFrom(properties.getProperty(MAX_ANIM_FRAMES_KEY), null);
     }
 
     public Path getFile() throws IOException {
@@ -63,7 +71,7 @@ public class AnimaticaConfig {
         writeTo(ppt);
 
         try (var os = Files.newOutputStream(file)) {
-            ppt.store(os, COMMENT);
+            ppt.store(os, String.join("\n", COMMENTS));
         }
     }
 
@@ -81,5 +89,14 @@ public class AnimaticaConfig {
 
     private static boolean boolFrom(String s, boolean defaultVal) {
         return s == null ? defaultVal : "true".equals(s);
+    }
+
+    private static Integer nullableIntFrom(String s, Integer defaultVal) {
+        try {
+            return s == null ? defaultVal : (s.equals("none") ? null : Integer.parseInt(s));
+        } catch (NumberFormatException ex) {
+            Animatica.LOG.error("Value {} must be an integer, or 'none'", s);
+        }
+        return defaultVal;
     }
 }

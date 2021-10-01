@@ -1,6 +1,7 @@
 package io.github.foundationgames.animatica.animation.bakery;
 
 import com.google.common.collect.ImmutableList;
+import io.github.foundationgames.animatica.Animatica;
 import io.github.foundationgames.animatica.animation.AnimationMeta;
 import io.github.foundationgames.animatica.util.TextureUtil;
 import net.minecraft.client.MinecraftClient;
@@ -20,9 +21,6 @@ public class AnimationBakery {
     private int frame = 0;
     private final Deque<Identifier> frameIds = new ArrayDeque<>();
     private final Identifier targetTexId;
-
-    // A stupid failsafe to prevent memory leaks - TODO: Make configurable
-    public static final int MAX_BAKE_FRAMES = 2048;
 
     public AnimationBakery(ResourceManager resources, Identifier targetTex, List<AnimationMeta> metas) throws IOException {
         this.anims = new Baking[metas.size()];
@@ -87,7 +85,7 @@ public class AnimationBakery {
         do {
             advance();
             i++;
-        } while (hasNext() && i < MAX_BAKE_FRAMES);
+        } while (hasNext() && (Animatica.CONFIG.maxAnimFrames == null || i < Animatica.CONFIG.maxAnimFrames));
 
         var ids = new Identifier[frameIds.size()];
         frameIds.toArray(ids);
