@@ -30,7 +30,7 @@ public enum TextureUtil {;
 
                 // set the color of the target pixel on the destination image
                 // to the color from the corresponding pixel on the source image
-                dest.setPixelColor(trgX, trgY, src.getPixelColor(srcX, srcY));
+                dest.setColor(trgX, trgY, src.getColor(srcX, srcY));
             }
         }
     }
@@ -67,7 +67,7 @@ public enum TextureUtil {;
 
                 // set the color of the target pixel on the destination image to a blend
                 // of the colors from the corresponding pixels on the source image
-                dest.setPixelColor(trgX, trgY, lerpRgba(src.getPixelColor(srcX0, srcY0), src.getPixelColor(srcX1, srcY1), blend));
+                dest.setColor(trgX, trgY, lerpRgba(src.getColor(srcX0, srcY0), src.getColor(srcX1, srcY1), blend));
             }
         }
     }
