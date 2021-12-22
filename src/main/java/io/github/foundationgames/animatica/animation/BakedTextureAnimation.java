@@ -18,8 +18,7 @@ public class BakedTextureAnimation {
     }
 
     public static BakedTextureAnimation bake(ResourceManager resources, Identifier targetId, List<AnimationMeta> anims) {
-        try {
-            var bakery = new AnimationBakery(resources, targetId, anims);
+        try (var bakery = new AnimationBakery(resources, targetId, anims)) {
             return new BakedTextureAnimation(bakery.bakeAndUpload());
         } catch (IOException e) { Animatica.LOG.error(e); }
         return new BakedTextureAnimation(new Identifier[] {EMPTY});

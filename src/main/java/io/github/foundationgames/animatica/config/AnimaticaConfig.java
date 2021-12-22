@@ -52,7 +52,7 @@ public class AnimaticaConfig {
 
     public void readFrom(Properties properties) {
         this.animatedTextures = boolFrom(properties.getProperty(ANIMATED_TEXTURES_KEY), true);
-        this.maxAnimFrames = nullableIntFrom(properties.getProperty(MAX_ANIM_FRAMES_KEY), null);
+        this.maxAnimFrames = nullableIntFrom(properties.getProperty(MAX_ANIM_FRAMES_KEY), 8000);
     }
 
     public Path getFile() throws IOException {

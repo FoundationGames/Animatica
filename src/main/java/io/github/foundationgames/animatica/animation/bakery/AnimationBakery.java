@@ -15,7 +15,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
-public class AnimationBakery {
+public class AnimationBakery implements AutoCloseable {
     public final Baking[] anims;
     private final NativeImage target;
     private int frame = 0;
@@ -92,7 +92,14 @@ public class AnimationBakery {
         return ids;
     }
 
-    public static class Baking {
+    @Override
+    public void close() {
+        for (var anim : anims) anim.close();
+
+        this.target.close();
+    }
+
+    public static class Baking implements AutoCloseable {
         private final List<Phase> phases;
         public final NativeImage source;
         public final int targetX;
@@ -121,12 +128,12 @@ public class AnimationBakery {
 
             final int frames = (int)Math.floor((float)source.getHeight() / meta.height());
 
-            int prevV = ((frames - 1) - meta.frameMapping().getOrDefault(frames - 1, frames - 1)) * meta.height(); // Initialize with the last frame in the animation
+            int prevV = meta.frameMapping().getOrDefault(frames - 1, frames - 1) * meta.height(); // Initialize with the last frame in the animation
             for (int f = 0; f < frames; f++) {
                 int fMap = meta.frameMapping().getOrDefault(f, f);
                 int fDuration = meta.frameDurations().getOrDefault(fMap, meta.defaultFrameDuration());
 
-                int v = ((frames - 1) - fMap) * meta.height(); // Reverses the frame number so that frames will be from top to bottom (rather than bottom to top)
+                int v = fMap * meta.height();
 
                 if (meta.interpolate()) {
                     // Handles adding interpolated animation phases
@@ -196,6 +203,11 @@ public class AnimationBakery {
                 frame = 0;
             }
             updateCurrentPhase();
+        }
+
+        @Override
+        public void close() {
+            this.source.close();
         }
     }
 
