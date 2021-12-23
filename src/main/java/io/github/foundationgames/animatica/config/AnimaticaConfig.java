@@ -52,7 +52,7 @@ public class AnimaticaConfig {
 
     public void readFrom(Properties properties) {
         this.animatedTextures = boolFrom(properties.getProperty(ANIMATED_TEXTURES_KEY), true);
-        this.maxAnimFrames = nullableIntFrom(properties.getProperty(MAX_ANIM_FRAMES_KEY), 8000);
+        this.maxAnimFrames = nullableIntFrom(properties.getProperty(MAX_ANIM_FRAMES_KEY), 20000); // 20K frames should often go past a gigabyte worth of animation, memory failsafe
     }
 
     public Path getFile() throws IOException {

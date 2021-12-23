@@ -165,13 +165,13 @@ public class AnimationBakery implements AutoCloseable {
             int progress = frame;
 
             for (var phase : phases) {
-                progress -= phase.duration; // Take away as much progress as each phase is long, until progress is below or equal to zero
+                progress -= phase.duration; // Take away as much progress as each phase is long, until progress is below zero
                 if (progress < 0) {
                     if (currentPhase != phase) {
-                        // Marks baking anim as changed should it be in a new phase
+                        // Marks baking anim as changed should it be in a new, unique phase
                         changed = true;
                     }
-                    if (phase instanceof InterpolatedPhase) changed = true; // Marks baking anim as changed should its current phase be a changing one
+                    if (phase instanceof InterpolatedPhase iPhase) changed = iPhase.hasChangingV(); // Marks baking anim as changed should its current phase be changing
 
                     this.currentPhase = phase;
                     this.phaseFrame = phase.duration + progress; // Adding progress to the phase duration results in how far it is into the phase
@@ -229,6 +229,10 @@ public class AnimationBakery implements AutoCloseable {
             super(duration, v);
             this.prevV = prevV;
             this.blend = blend;
+        }
+
+        public boolean hasChangingV() {
+            return this.prevV != this.v;
         }
     }
 
