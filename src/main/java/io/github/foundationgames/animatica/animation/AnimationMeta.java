@@ -35,8 +35,8 @@ public record AnimationMeta(
                 PropertyUtil.getIntOr(file, properties, "duration", 1),
                 PropertyUtil.getBoolOr(file, properties, "interpolate", false),
                 PropertyUtil.getIntOr(file, properties, "skip", 0),
-                PropertyUtil.intToIntMap(PropertyUtil.getCompound(properties, "tile")),
-                PropertyUtil.intToIntMap(PropertyUtil.getCompound(properties, "duration"))
+                PropertyUtil.intToIntMap(PropertyUtil.getSubProperties(properties, "tile")),
+                PropertyUtil.intToIntMap(PropertyUtil.getSubProperties(properties, "duration"))
         );
     }
 }

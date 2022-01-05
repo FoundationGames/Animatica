@@ -18,7 +18,7 @@ public enum PropertyUtil {;
         return p;
     }
 
-    public static Properties getCompound(Properties properties, String key) {
+    public static Properties getSubProperties(Properties properties, String key) {
         var p = new Properties();
         final var prefix = key + ".";
         for (String k : properties.stringPropertyNames()) {
