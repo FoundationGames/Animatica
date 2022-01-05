@@ -71,9 +71,9 @@ public class AnimationBakery implements AutoCloseable {
 
             var id = new Identifier(targetTexId.getNamespace(), targetTexId.getPath() + ".anim" + frameIds.size());
             textures.registerTexture(id, new NativeImageBackedTexture(frameImg));
-            frameIds.push(id);
+            frameIds.addLast(id);
         } else {
-            frameIds.push(frameIds.getFirst());
+            frameIds.addLast(frameIds.getLast());
         }
 
         for (var anim : anims) anim.advance();
@@ -128,12 +128,12 @@ public class AnimationBakery implements AutoCloseable {
 
             final int frames = (int)Math.floor((float)source.getHeight() / meta.height());
 
-            int prevV = meta.frameMapping().getOrDefault(frames - 1, frames - 1) * meta.height(); // Initialize with the last frame in the animation
+            int prevV = getVForFrame(meta.frameMapping().getOrDefault(frames - 1, frames - 1)); // Initialize with the last frame in the animation
             for (int f = 0; f < frames; f++) {
                 int fMap = meta.frameMapping().getOrDefault(f, f);
-                int fDuration = meta.frameDurations().getOrDefault(fMap, meta.defaultFrameDuration());
+                int fDuration = meta.frameDurations().getOrDefault(f, meta.defaultFrameDuration());
 
-                int v = fMap * meta.height();
+                int v = getVForFrame(fMap);
 
                 if (meta.interpolate()) {
                     // Handles adding interpolated animation phases
@@ -209,6 +209,10 @@ public class AnimationBakery implements AutoCloseable {
         public void close() {
             this.source.close();
         }
+
+        private int getVForFrame(int frame) {
+            return frame * this.height;
+        }
     }
 
     public static class Phase {
@@ -218,6 +222,11 @@ public class AnimationBakery implements AutoCloseable {
         public Phase(int duration, int v) {
             this.duration = duration;
             this.v = v;
+        }
+
+        @Override
+        public String toString() {
+            return "Animation Bakery Phase { v: "+this.v+" }";
         }
     }
 
