@@ -13,6 +13,7 @@ import net.minecraft.util.math.MathHelper;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
@@ -132,34 +133,43 @@ public class AnimationBakery implements AutoCloseable {
             final int textureFrameCount = (int)Math.floor((float) sourceTexture.getHeight() / meta.height());
             final int animFrameCount = Math.max(textureFrameCount, meta.getGreatestUsedFrame() + 1);
 
-            int prevV = getVForFrame(meta.frameMapping().getOrDefault(animFrameCount - 1, textureFrameCount - 1), textureFrameCount); // Initialize with the last frame in the animation
+            // The int array stored for each frame must contain the frame mapping and duration
+            List<int[]> frames = new ArrayList<>();
             for (int f = 0; f < animFrameCount; f++) {
                 if (f >= textureFrameCount && !meta.frameMapping().containsKey(f)) {
                     continue;
                 }
 
-                int fMap = meta.frameMapping().getOrDefault(f, f);
-                int fDuration = meta.frameDurations().getOrDefault(f, meta.defaultFrameDuration());
+                frames.add(new int[] {
+                        meta.frameMapping().getOrDefault(f, f),
+                        meta.frameDurations().getOrDefault(f, meta.defaultFrameDuration())
+                });
+            }
+
+            for (int i = 0; i < frames.size(); i++) {
+                int[] frame = frames.get(i);
+
+                int fMap = frame[0];
+                int fDuration = frame[1];
 
                 int v = getVForFrame(fMap, textureFrameCount);
+                int nextV = getVForFrame(frames.get(Math.floorMod(i + 1, frames.size()))[0], textureFrameCount);
 
                 if (meta.interpolate()) {
-                    // Handles adding interpolated animation phases
-                    final int interpolatedDuration = fDuration - meta.interpolationDelay();
-                    phases.add(new InterpolatedPhase(interpolatedDuration, v, prevV, (phaseFrame) -> ((float) phaseFrame / interpolatedDuration)));
-                    duration += interpolatedDuration;
-
                     if (meta.interpolationDelay() > 0) {
                         // Adds a static version of the current phase as a "delay" before the next interpolated phase (if specified in animation)
                         phases.add(new Phase(meta.interpolationDelay(), v));
                         duration += meta.interpolationDelay();
                     }
+
+                    // Add interpolated animation phase
+                    final int interpolatedDuration = fDuration - meta.interpolationDelay();
+                    phases.add(new InterpolatedPhase(interpolatedDuration, v, nextV, (phaseFrame) -> ((float) phaseFrame / interpolatedDuration)));
+                    duration += interpolatedDuration;
                 } else {
                     phases.add(new Phase(fDuration, v));
                     duration += fDuration;
                 }
-
-                prevV = v;
             }
 
             this.duration = duration;
@@ -247,9 +257,9 @@ public class AnimationBakery implements AutoCloseable {
         public final int prevV;
         public final BlendInterpolator blend;
 
-        public InterpolatedPhase(int duration, int v, int prevV, BlendInterpolator blend) {
-            super(duration, v);
-            this.prevV = prevV;
+        public InterpolatedPhase(int duration, int v1, int v2, BlendInterpolator blend) {
+            super(duration, v2);
+            this.prevV = v1;
             this.blend = blend;
         }
 
