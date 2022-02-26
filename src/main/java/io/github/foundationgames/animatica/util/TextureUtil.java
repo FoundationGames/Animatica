@@ -73,18 +73,34 @@ public enum TextureUtil {;
     }
 
     public static int lerpColor(NativeImage.Format format, int c1, int c2, float delta) {
+        int a1 = (c1 >> format.getAlphaChannelOffset()) & 0xFF;
+        int r1 = (c1 >> format.getRedOffset()) & 0xFF;
+        int g1 = (c1 >> format.getGreenOffset()) & 0xFF;
+        int b1 = (c1 >> format.getBlueOffset()) & 0xFF;
+
         int a2 = (c2 >> format.getAlphaChannelOffset()) & 0xFF;
         int r2 = (c2 >> format.getRedOffset()) & 0xFF;
         int g2 = (c2 >> format.getGreenOffset()) & 0xFF;
         int b2 = (c2 >> format.getBlueOffset()) & 0xFF;
-        int a1 = (c1 >> format.getAlphaChannelOffset()) & 0xFF;
-        int r1 = a1 <= 0 ? r2 : (c1 >> format.getRedOffset()) & 0xFF;
-        int g1 = a1 <= 0 ? g2 : (c1 >> format.getGreenOffset()) & 0xFF;
-        int b1 = a1 <= 0 ? b2 : (c1 >> format.getBlueOffset()) & 0xFF;
+
+        // If the first or second color is transparent,
+        // don't lerp any leftover rgb values and instead
+        // only use those of the non-transparent color
+        if (a1 <= 0) {
+            r1 = r2;
+            g1 = g2;
+            b1 = b2;
+        } else if (a2 <= 0) {
+            r2 = r1;
+            g2 = g1;
+            b2 = b1;
+        }
+
         int oa = (int)MathHelper.lerp(delta, a1, a2);
         int or = (int)MathHelper.lerp(delta, r1, r2);
         int og = (int)MathHelper.lerp(delta, g1, g2);
         int ob = (int)MathHelper.lerp(delta, b1, b2);
+
         return (oa << format.getAlphaChannelOffset()) | (or << format.getRedOffset()) | (og << format.getGreenOffset()) | (ob << format.getBlueOffset());
     }
 }
