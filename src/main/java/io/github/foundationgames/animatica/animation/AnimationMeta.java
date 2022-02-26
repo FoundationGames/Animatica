@@ -7,8 +7,10 @@ import io.github.foundationgames.animatica.util.exception.PropertyParseException
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 public record AnimationMeta(
         Identifier source, Identifier target, int targetX,
@@ -38,5 +40,17 @@ public record AnimationMeta(
                 PropertyUtil.intToIntMap(PropertyUtil.getSubProperties(properties, "tile")),
                 PropertyUtil.intToIntMap(PropertyUtil.getSubProperties(properties, "duration"))
         );
+    }
+
+    public int getGreatestUsedFrame() {
+        Set<Integer> frames = new HashSet<>(frameMapping.keySet());
+        frames.addAll(frameDurations.keySet());
+
+        int greatestFrame = 0;
+        for (int frame : frames) {
+            greatestFrame = Math.max(frame, greatestFrame);
+        }
+
+        return greatestFrame;
     }
 }
