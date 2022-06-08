@@ -30,7 +30,7 @@ public class AnimationBakery implements AutoCloseable {
             this.anims[i] = new Baking(metas.get(i), resources);
         }
 
-        try (var target = resources.getResource(targetTex).getInputStream()) {
+        try (var target = resources.getResourceOrThrow(targetTex).getInputStream()) {
             this.target = NativeImage.read(target);
         }
 
@@ -123,7 +123,7 @@ public class AnimationBakery implements AutoCloseable {
             this.width = meta.width();
             this.height = meta.height();
 
-            try (var source = resources.getResource(meta.source()).getInputStream()) {
+            try (var source = resources.getResourceOrThrow(meta.source()).getInputStream()) {
                 this.sourceTexture = NativeImage.read(source);
             }
 

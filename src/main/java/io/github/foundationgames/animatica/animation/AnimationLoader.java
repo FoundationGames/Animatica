@@ -4,11 +4,13 @@ import io.github.foundationgames.animatica.Animatica;
 import io.github.foundationgames.animatica.util.Flags;
 import io.github.foundationgames.animatica.util.exception.PropertyParseException;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class AnimationLoader implements SimpleSynchronousResourceReloadListener {
@@ -26,9 +28,9 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
     private AnimationLoader() {
     }
 
-    private static void findAllMCPAnimations(ResourceManager manager, Consumer<Identifier> action) {
+    private static void findAllMCPAnimations(ResourceManager manager, BiConsumer<Identifier, Resource> action) {
         for (var path : ANIM_PATHS) {
-            manager.findResources(path, p -> p.endsWith(".properties")).forEach(action);
+            manager.findResources(path, p -> p.getPath().endsWith(".properties")).forEach(action);
         }
     }
 
@@ -53,11 +55,11 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
         this.animatedTextures.clear();
         var animations = new HashMap<Identifier, List<AnimationMeta>>();
 
-        findAllMCPAnimations(manager, id -> {
+        findAllMCPAnimations(manager, (id, resource) -> {
             try {
-                try (var resource = manager.getResource(id).getInputStream()) {
+                try (var resourceInputStream = resource.getInputStream()) {
                     var ppt = new Properties();
-                    ppt.load(resource);
+                    ppt.load(resourceInputStream);
 
                     var anim = AnimationMeta.of(id, ppt);
 
