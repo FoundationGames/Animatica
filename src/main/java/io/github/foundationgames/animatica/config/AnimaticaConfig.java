@@ -13,15 +13,18 @@ import java.util.Properties;
 public class AnimaticaConfig {
     public boolean animatedTextures;
     public Integer maxAnimFrames;
+    public boolean safeMode;
 
     public static String ANIMATED_TEXTURES_KEY = "animated_textures";
     public static String MAX_ANIM_FRAMES_KEY = "max_animation_frames";
+    public static String SAFE_MODE_KEY = "safe_mode";
 
     public static final String FILE_NAME = "animatica.properties";
     public static final String[] COMMENTS = {
             "Configuration file for Animatica",
             "animated_textures=<true|false> - Determines whether custom texture animation support should be enabled or not",
-            "max_animation_frames=<integer value, or 'none'> - Maximum unique animation frames a texture can have, to prevent high RAM/VRAM usage (disabled when set to 'none')"
+            "max_animation_frames=<integer value, or 'none'> - Maximum unique animation frames a texture can have, to prevent high RAM/VRAM usage (disabled when set to 'none')",
+            "safe_mode=<true|false> - When enabled, doesn't generate animations, however provides important debug information"
     };
 
     public static final CyclingOption<Boolean> ANIMATED_TEXTURES_OPTION = CyclingOption.create("option.animatica.animated_textures", opts -> {
@@ -48,11 +51,13 @@ public class AnimaticaConfig {
     public void writeTo(Properties properties) {
         properties.put(ANIMATED_TEXTURES_KEY, Boolean.toString(animatedTextures));
         properties.put(MAX_ANIM_FRAMES_KEY, maxAnimFrames == null ? "none" : maxAnimFrames.toString());
+        properties.put(SAFE_MODE_KEY, Boolean.toString(safeMode));
     }
 
     public void readFrom(Properties properties) {
         this.animatedTextures = boolFrom(properties.getProperty(ANIMATED_TEXTURES_KEY), true);
-        this.maxAnimFrames = nullableIntFrom(properties.getProperty(MAX_ANIM_FRAMES_KEY), 20000); // 20K frames should often go past a gigabyte worth of animation, memory failsafe
+        this.maxAnimFrames = nullableIntFrom(properties.getProperty(MAX_ANIM_FRAMES_KEY), 7000); // 7K frames should often go past a gigabyte worth of animation, memory failsafe
+        this.safeMode = boolFrom(properties.getProperty(SAFE_MODE_KEY), false);
     }
 
     public Path getFile() throws IOException {
