@@ -5,19 +5,19 @@ import io.github.foundationgames.animatica.util.Flags;
 import io.github.foundationgames.animatica.util.Utilities;
 import io.github.foundationgames.animatica.util.exception.PropertyParseException;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.Consumer;
 
 public final class AnimationLoader implements SimpleSynchronousResourceReloadListener {
     public static final String[] ANIM_PATHS = {
@@ -103,21 +103,28 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
         int frameHeight;
         int bytesPerPix;
 
-        try (var target = manager.getResource(targetTex).getInputStream()) {
-            try (var img = NativeImage.read(target)) {
-                frameWidth = img.getWidth();
-                frameHeight = img.getHeight();
-                bytesPerPix = img.getFormat().getChannelCount();
+        var targetTexRes = manager.getResource(targetTex);
+        if (targetTexRes.isPresent()) {
+            try (var target = targetTexRes.get().getInputStream()) {
+                try (var img = NativeImage.read(target)) {
+                    frameWidth = img.getWidth();
+                    frameHeight = img.getHeight();
+                    bytesPerPix = img.getFormat().getChannelCount();
+                }
             }
-        }
+        } else throw new FileNotFoundException(targetTex.toString());
+
 
         for (int i = 0; i < anims.size(); i++) {
             var meta = anims.get(i);
 
-            try (var source = manager.getResource(meta.source()).getInputStream()) {
-                var tex = NativeImage.read(source);
-                frameCounts[i] = Math.max((int)Math.floor((float) tex.getHeight() / meta.height()), meta.getGreatestUsedFrame() + 1);
-            }
+            var sourceTexRes = manager.getResource(meta.source());
+            if (sourceTexRes.isPresent()) {
+                try (var source = sourceTexRes.get().getInputStream()) {
+                    var tex = NativeImage.read(source);
+                    frameCounts[i] = Math.max((int)Math.floor((float) tex.getHeight() / meta.height()), meta.getGreatestUsedFrame() + 1);
+                }
+            } else throw new FileNotFoundException(meta.source().toString());
         }
 
         int frameCount = Utilities.lcm(frameCounts);

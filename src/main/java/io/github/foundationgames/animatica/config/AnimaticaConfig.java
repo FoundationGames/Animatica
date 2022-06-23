@@ -27,7 +27,7 @@ public class AnimaticaConfig {
             "safe_mode=<true|false> - When enabled, doesn't generate animations, however provides important debug information"
     };
 
-    public static SimpleOption<Boolean> ANIMATED_TEXTURES_OPTION;
+    private final SimpleOption<Boolean> option;
 
     public AnimaticaConfig() {
         try {
@@ -36,7 +36,7 @@ public class AnimaticaConfig {
             Animatica.LOG.error("Error loading config during initialization!", e);
         }
 
-        ANIMATED_TEXTURES_OPTION = SimpleOption.ofBoolean(
+        this.option = SimpleOption.ofBoolean(
                 "option.animatica.animated_textures",
                 this.animatedTextures,
                 value -> {
@@ -68,6 +68,10 @@ public class AnimaticaConfig {
         }
 
         return file;
+    }
+
+    public SimpleOption<Boolean> getOption() {
+        return option;
     }
 
     public void save() throws IOException {
