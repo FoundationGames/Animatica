@@ -3,7 +3,7 @@ package io.github.foundationgames.animatica.config;
 import io.github.foundationgames.animatica.Animatica;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.CyclingOption;
+import net.minecraft.client.option.SimpleOption;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,18 +27,7 @@ public class AnimaticaConfig {
             "safe_mode=<true|false> - When enabled, doesn't generate animations, however provides important debug information"
     };
 
-    public static final CyclingOption<Boolean> ANIMATED_TEXTURES_OPTION = CyclingOption.create("option.animatica.animated_textures", opts -> {
-        try {
-            Animatica.CONFIG.load();
-        } catch (IOException e) { Animatica.LOG.error("Error loading config for options screen!", e); }
-        return Animatica.CONFIG.animatedTextures;
-    }, (opts, option, value) -> {
-        Animatica.CONFIG.animatedTextures = value;
-        try {
-            Animatica.CONFIG.save();
-        } catch (IOException e) { Animatica.LOG.error("Error saving config while changing in game!", e); }
-        MinecraftClient.getInstance().reloadResources();
-    });
+    public static SimpleOption<Boolean> ANIMATED_TEXTURES_OPTION;
 
     public AnimaticaConfig() {
         try {
@@ -46,6 +35,18 @@ public class AnimaticaConfig {
         } catch (IOException e) {
             Animatica.LOG.error("Error loading config during initialization!", e);
         }
+
+        ANIMATED_TEXTURES_OPTION = SimpleOption.ofBoolean(
+                "option.animatica.animated_textures",
+                this.animatedTextures,
+                value -> {
+                    this.animatedTextures = value;
+                    try {
+                        this.save();
+                    } catch (IOException e) { Animatica.LOG.error("Error saving config while changing in game!", e); }
+                    MinecraftClient.getInstance().reloadResources();
+                }
+        );
     }
 
     public void writeTo(Properties properties) {
