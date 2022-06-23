@@ -23,7 +23,7 @@ public abstract class VideoOptionsScreenMixin extends Screen {
             ),
             index = 0
     )
-    private Option[] enhanced_bes$addEBEOptionButton(Option[] old) {
+    private Option[] animatica$addTextureAnimationOptionButton(Option[] old) {
         var options = new Option[old.length + 1];
         System.arraycopy(old, 0, options, 0, old.length);
         options[options.length - 1] = AnimaticaConfig.ANIMATED_TEXTURES_OPTION;
