@@ -9,7 +9,7 @@ This includes:
 - Animated armor textures
 - Other animated textures (Animated blocks and items are a vanilla feature)
 ## Animatica DOES NOT support:
-- Fully Custom GUI (No mod exists yet)
+- Fully Custom GUI ([OptiGUI for Fabric](https://www.curseforge.com/minecraft/mc-mods/optigui))
 - Custom entity models ([CEM for Fabric](https://www.curseforge.com/minecraft/mc-mods/custom-entity-models-cem))
 - Custom entity model part animations in 3D ([CEM for Fabric](https://www.curseforge.com/minecraft/mc-mods/custom-entity-models-cem))
 - Any other MCPatcher/OptiFine resource pack feature such as connected textures, etc
