@@ -12,11 +12,13 @@ import net.minecraft.util.Identifier;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.BiConsumer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 public final class AnimationLoader implements SimpleSynchronousResourceReloadListener {

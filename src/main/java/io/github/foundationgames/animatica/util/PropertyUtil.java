@@ -1,6 +1,7 @@
 package io.github.foundationgames.animatica.util;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import io.github.foundationgames.animatica.util.exception.InvalidPropertyException;
 import io.github.foundationgames.animatica.util.exception.MissingPropertyException;
 import io.github.foundationgames.animatica.util.exception.PropertyParseException;
