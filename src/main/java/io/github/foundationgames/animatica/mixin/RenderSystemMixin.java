@@ -3,6 +3,7 @@ package io.github.foundationgames.animatica.mixin;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.foundationgames.animatica.Animatica;
 import io.github.foundationgames.animatica.animation.AnimationLoader;
+import io.github.foundationgames.animatica.animation.BakedTextureAnimation;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
