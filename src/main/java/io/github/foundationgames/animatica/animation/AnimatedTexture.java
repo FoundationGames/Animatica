@@ -1,8 +1,7 @@
-package io.github.foundationgames.animatica.animation.bakery;
+package io.github.foundationgames.animatica.animation;
 
 import com.google.common.collect.ImmutableList;
 import io.github.foundationgames.animatica.Animatica;
-import io.github.foundationgames.animatica.animation.AnimationMeta;
 import io.github.foundationgames.animatica.util.TextureUtil;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -35,8 +34,10 @@ public class AnimatedTexture extends NativeImageBackedTexture {
         for (int i = 0; i < metas.size(); i++) {
             this.anims[i] = new Animation(metas.get(i), resources);
         }
-
         this.original = image;
+
+        updateAndDraw(this.getImage(), true);
+        this.upload();
     }
 
     public boolean canLoop() {
@@ -49,7 +50,7 @@ public class AnimatedTexture extends NativeImageBackedTexture {
         return true;
     }
 
-    public void updateAndDraw(NativeImage image, boolean force) {
+    public boolean updateAndDraw(NativeImage image, boolean force) {
         boolean changed = false;
 
         if (canLoop()) {
@@ -85,10 +86,14 @@ public class AnimatedTexture extends NativeImageBackedTexture {
             anim.advance();
         }
         frame++;
+
+        return changed;
     }
 
     public void tick() {
-        this.updateAndDraw(this.getImage(), false);
+        if (this.updateAndDraw(this.getImage(), false)) {
+            this.upload();
+        }
     }
 
     @Override

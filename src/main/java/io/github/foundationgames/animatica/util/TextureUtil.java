@@ -96,10 +96,10 @@ public enum TextureUtil {;
             b2 = b1;
         }
 
-        int oa = (int)MathHelper.lerp(delta, a1, a2);
-        int or = (int)MathHelper.lerp(delta, r1, r2);
-        int og = (int)MathHelper.lerp(delta, g1, g2);
-        int ob = (int)MathHelper.lerp(delta, b1, b2);
+        int oa = MathHelper.lerp(delta, a1, a2);
+        int or = MathHelper.lerp(delta, r1, r2);
+        int og = MathHelper.lerp(delta, g1, g2);
+        int ob = MathHelper.lerp(delta, b1, b2);
 
         return (oa << format.getAlphaOffset()) | (or << format.getRedOffset()) | (og << format.getGreenOffset()) | (ob << format.getBlueOffset());
     }

@@ -40,22 +40,6 @@ public enum PropertyUtil {;
         return r;
     }
 
-    public static boolean getBool(Identifier file, Properties properties, String key) throws PropertyParseException {
-        var p = get(file, properties, key);
-        if ("false".equals(p) || "true".equals(p)) {
-            return "true".equals(p);
-        }
-        throw new InvalidPropertyException(file, key, "boolean (false/true)");
-    }
-
-    public static String getOr(Identifier file, Properties properties, String key, String defaultVal) throws PropertyParseException {
-        var p = properties.getProperty(key);
-        if (p == null) {
-            return defaultVal;
-        }
-        return p;
-    }
-
     public static int getIntOr(Identifier file, Properties properties, String key, int defaultVal) throws PropertyParseException {
         var p = properties.getProperty(key);
         if (p == null) {

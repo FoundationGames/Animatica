@@ -13,9 +13,9 @@ public class RenderSystemMixin {
     @ModifyVariable(method = "_setShaderTexture(ILnet/minecraft/util/Identifier;)V", at = @At("HEAD"), index = 1)
     private static Identifier animatica$replaceWithAnimatedTexture(Identifier old) {
         if (Animatica.CONFIG.animatedTextures) {
-            var anim = AnimationLoader.INSTANCE.getAnimation(old);
+            var anim = AnimationLoader.INSTANCE.getAnimationId(old);
             if (anim != null) {
-                return anim.getTextureForFrame();
+                return anim;
             }
         }
         return old;

@@ -16,17 +16,11 @@ public class Animatica implements ClientModInitializer {
 
     public static final AnimaticaConfig CONFIG = new AnimaticaConfig();
 
-    private static long time = 0;
-
     @Override
     public void onInitializeClient() {
-        ClientTickEvents.START_CLIENT_TICK.register(client -> time++);
+        ClientTickEvents.START_CLIENT_TICK.register(client -> AnimationLoader.INSTANCE.tickTextures());
 
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(AnimationLoader.INSTANCE);
-    }
-
-    public static long getTime() {
-        return time;
     }
 
     public static Identifier id(String path) {
