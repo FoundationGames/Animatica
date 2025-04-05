@@ -1,6 +1,5 @@
 package io.github.foundationgames.animatica.animation;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.foundationgames.animatica.Animatica;
 import io.github.foundationgames.animatica.util.Flags;
 import io.github.foundationgames.animatica.util.exception.PropertyParseException;
@@ -49,12 +48,8 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
     }
 
     public void tickTextures() {
-        if (!RenderSystem.isOnRenderThread()) {
-            RenderSystem.recordRenderCall(this::tickTextures);
-        } else {
-            for (var texture : animatedTextures) {
-                texture.tick();
-            }
+        for (var texture : animatedTextures) {
+            texture.tick();
         }
     }
 
