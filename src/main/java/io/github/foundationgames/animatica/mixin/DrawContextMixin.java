@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(DrawContext.class)
 public class DrawContextMixin {
-    @ModifyVariable(method = "drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIIIIII)V", at = @At("HEAD"), index = 2, argsOnly = true)
+    @ModifyVariable(method = "drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIIIIII)V", at = @At("HEAD"), index = 2, argsOnly = true)
     private Identifier animatica$replaceWithAnimatedTexture(Identifier old) {
         if (Animatica.CONFIG.animatedTextures) {
             var anim = AnimationLoader.INSTANCE.getAnimationId(old);
