@@ -45,6 +45,8 @@ public class AnimatedTexture extends NativeImageBackedTexture {
             this.anims[i] = new Animation(metas.get(i), resources);
         }
         this.original = image;
+        this.setClamp(false);
+        this.setFilter(false, false);
 
         updateAndDraw(this.getImage(), true, MinecraftClient.getInstance());
         this.upload();
