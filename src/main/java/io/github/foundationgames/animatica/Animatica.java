@@ -3,7 +3,6 @@ package io.github.foundationgames.animatica;
 import io.github.foundationgames.animatica.animation.AnimationLoader;
 import io.github.foundationgames.animatica.config.AnimaticaConfig;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -18,8 +17,6 @@ public class Animatica implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ClientTickEvents.START_CLIENT_TICK.register(client -> AnimationLoader.INSTANCE.tickTextures());
-
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(AnimationLoader.INSTANCE);
     }
 

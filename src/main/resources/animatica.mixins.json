@@ -6,7 +6,7 @@
   "client": [
     "IdentifierMixin",
     "NativeImageAccessor",
-    "RenderSystemMixin",
+    "TextureManagerMixin",
     "VideoOptionsScreenMixin"
   ],
   "injectors": {

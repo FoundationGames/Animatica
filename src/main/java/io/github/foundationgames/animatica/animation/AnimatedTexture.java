@@ -6,6 +6,7 @@ import io.github.foundationgames.animatica.util.TextureUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.client.texture.TextureTickListener;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -19,8 +20,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
-public class AnimatedTexture extends NativeImageBackedTexture {
+public class AnimatedTexture extends NativeImageBackedTexture implements TextureTickListener {
     public static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(4);
 
     public final Animation[] anims;
@@ -31,22 +33,20 @@ public class AnimatedTexture extends NativeImageBackedTexture {
 
     public static Optional<AnimatedTexture> tryCreate(ResourceManager resources, Identifier targetTexId, List<AnimationMeta> anims) {
         try (var targetTexResource = resources.getResourceOrThrow(targetTexId).getInputStream()) {
-            return Optional.of(new AnimatedTexture(resources, anims, NativeImage.read(targetTexResource)));
+            return Optional.of(new AnimatedTexture(targetTexId::toString, resources, anims, NativeImage.read(targetTexResource)));
         } catch (IOException e) { Animatica.LOG.error(e); }
 
         return Optional.empty();
     }
 
-    public AnimatedTexture(ResourceManager resources, List<AnimationMeta> metas, NativeImage image) throws IOException {
-        super(new NativeImage(image.getFormat(), image.getWidth(), image.getHeight(), true));
+    public AnimatedTexture(Supplier<String> name, ResourceManager resources, List<AnimationMeta> metas, NativeImage image) throws IOException {
+        super(name, image.getWidth(), image.getHeight(), true);
 
         this.anims = new Animation[metas.size()];
         for (int i = 0; i < metas.size(); i++) {
             this.anims[i] = new Animation(metas.get(i), resources);
         }
         this.original = image;
-        this.setClamp(false);
-        this.setFilter(false, false);
 
         updateAndDraw(this.getImage(), true, MinecraftClient.getInstance());
         this.upload();
@@ -91,7 +91,7 @@ public class AnimatedTexture extends NativeImageBackedTexture {
         if (changed || force) {
             // Skip if still waiting for a frame to finish
             if (this.getFrameWaitingOn() == null) {
-                this.frameWaitingOn = CompletableFuture.supplyAsync(() -> {
+                this.frameWaitingOn = CompletableFuture.runAsync(() -> {
                     image.copyFrom(this.original);
 
                     Phase phase;
@@ -103,8 +103,6 @@ public class AnimatedTexture extends NativeImageBackedTexture {
                             TextureUtil.copy(anim.sourceTexture, 0, phase.v, anim.width, anim.height, image, anim.targetX, anim.targetY);
                         }
                     }
-
-                    return null;
                 }, exec).thenAccept(v -> MinecraftClient.getInstance().execute(this::upload));
             }
         }
@@ -115,6 +113,7 @@ public class AnimatedTexture extends NativeImageBackedTexture {
         frame++;
     }
 
+    @Override
     public void tick() {
         this.updateAndDraw(this.getImage(), false, EXECUTORS);
     }

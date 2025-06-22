@@ -1,24 +1,21 @@
 package io.github.foundationgames.animatica.animation;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.foundationgames.animatica.Animatica;
 import io.github.foundationgames.animatica.util.Flags;
 import io.github.foundationgames.animatica.util.exception.PropertyParseException;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.function.BiConsumer;
 
 public final class AnimationLoader implements SimpleSynchronousResourceReloadListener {
@@ -31,8 +28,7 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
 
     public static final AnimationLoader INSTANCE = new AnimationLoader();
 
-    private final Int2IntMap animationIds = new Int2IntOpenHashMap();
-    private final Set<AnimatedTexture> animatedTextures = new HashSet<>();
+    private final Map<Identifier, Identifier> animationIds = new HashMap<>();
 
     private AnimationLoader() {
     }
@@ -43,22 +39,8 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
         }
     }
 
-    public boolean isAnimated(int glId) {
-        return animationIds.containsKey(glId);
-    }
-
-    public int getAnimationId(int glId) {
-        return animationIds.get(glId);
-    }
-
-    public void tickTextures() {
-        if (!RenderSystem.isOnRenderThread()) {
-            RenderSystem.recordRenderCall(this::tickTextures);
-        } else {
-            for (var texture : animatedTextures) {
-                texture.tick();
-            }
-        }
+    public @Nullable Identifier getAnimationId(Identifier id) {
+        return animationIds.get(id);
     }
 
     @Override
@@ -68,7 +50,6 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
 
     @Override
     public void reload(ResourceManager manager) {
-        this.animatedTextures.clear();
         this.animationIds.clear();
 
         if (!Animatica.CONFIG.animatedTextures) {
@@ -99,16 +80,9 @@ public final class AnimationLoader implements SimpleSynchronousResourceReloadLis
         for (var targetId : animations.keySet()) {
             AnimatedTexture.tryCreate(manager, targetId, animations.get(targetId))
                     .ifPresent(tex -> {
-                        var textures = MinecraftClient.getInstance().getTextureManager();
-                        var tgt = textures.getTexture(targetId);
-
-                        if (tgt != null) {
-                            textures.registerTexture(
-                                    Identifier.of(targetId.getNamespace(), targetId.getPath() + "-anim"), tex);
-
-                            this.animatedTextures.add(tex);
-                            this.animationIds.put(tgt.getGlId(), tex.getGlId());
-                        }
+                        var animId = Identifier.of(targetId.getNamespace(), targetId.getPath() + "-anim");
+                        this.animationIds.put(targetId, animId);
+                        MinecraftClient.getInstance().getTextureManager().registerTexture(animId, tex);
                     });
         }
 
