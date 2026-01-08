@@ -1,3 +1,4 @@
 {
-    "option.animatica.animated_textures": "自定义动画"
+    "option.animatica.animated_textures": "自定义动画",
+    "options.animatica.animations.tooltip": "通过 Animatica 切换自定义动画的可见性。"
 }

@@ -1,3 +1,4 @@
 {
-    "option.animatica.animated_textures": "Animaciones personalizadas"
+    "option.animatica.animated_textures": "Animaciones personalizadas",
+    "options.animatica.animations.tooltip": "Activa o desactiva la visibilidad de animaciones personalizadas mediante Animatica."
 }

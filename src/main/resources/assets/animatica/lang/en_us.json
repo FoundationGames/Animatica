@@ -1,3 +1,4 @@
 {
-    "option.animatica.animated_textures": "Custom Animations"
+    "option.animatica.animated_textures": "Custom Animations",
+    "options.animatica.animations.tooltip": "Toggles the visibility of custom animations through Animatica."
 }

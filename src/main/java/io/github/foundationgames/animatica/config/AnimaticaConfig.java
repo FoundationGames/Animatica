@@ -4,6 +4,8 @@ import io.github.foundationgames.animatica.Animatica;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
+import net.minecraft.network.chat.Component;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +13,7 @@ import java.util.Properties;
 
 public class AnimaticaConfig {
     public static String ANIMATED_TEXTURES_KEY = "animated_textures";
+    private static final Component GRAPHICS_TOOLTIP_ANIMATIONS = Component.translatable("options.animatica.animations.tooltip");
 
     public static final String FILE_NAME = "animatica.properties";
 
@@ -26,6 +29,7 @@ public class AnimaticaConfig {
 
         this.animatedTexturesOption = OptionInstance.createBoolean(
                 "option.animatica.animated_textures",
+                OptionInstance.cachedConstantTooltip(GRAPHICS_TOOLTIP_ANIMATIONS),
                 this.animatedTextures,
                 value -> {
                     this.animatedTextures = value;

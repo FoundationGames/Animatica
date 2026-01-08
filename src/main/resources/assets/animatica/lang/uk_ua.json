@@ -1,3 +1,4 @@
 {
-    "option.animatica.animated_textures": "Власні анімації"
+    "option.animatica.animated_textures": "Власні анімації",
+    "options.animatica.animations.tooltip": "Перемикає видимість користувацьких анімацій через Animatica."
 }
