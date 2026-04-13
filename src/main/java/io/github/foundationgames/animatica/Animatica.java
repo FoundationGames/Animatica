@@ -4,8 +4,8 @@ import io.github.foundationgames.animatica.animation.AnimationLoader;
 import io.github.foundationgames.animatica.config.AnimaticaConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,10 +17,10 @@ public class Animatica implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(AnimationLoader.INSTANCE);
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(AnimationLoader.INSTANCE);
     }
 
     public static Identifier id(String path) {
-        return Identifier.of(NAMESPACE, path);
+        return Identifier.fromNamespaceAndPath(NAMESPACE, path);
     }
 }
