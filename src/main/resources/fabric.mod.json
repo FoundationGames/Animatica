@@ -3,14 +3,15 @@
   "id": "animatica",
   "version": "${version}",
 
-  "name": "Animatica",
+  "name": "Animatica Refabricated",
   "description": "Allow for animating more game textures using the MCPatcher/OptiFine animation format",
   "authors": [
-    "FoundationGames"
+    "FoundationGames, coredex-source"
   ],
   "contact": {
-    "homepage": "https://github.com/FoundationGames/Animatica",
-    "sources": "https://github.com/FoundationGames/Animatica"
+    "homepage": "https://github.com/coredex-source/AnimaticaRefabricated",
+    "sources": "https://github.com/coredex-source/AnimaticaRefabricated",
+    "issues": "https://github.com/coredex-source/AnimaticaRefabricated/issues",
   },
 
   "license": "LGPLv3",
