@@ -1,8 +1,8 @@
 package io.github.foundationgames.animatica.util;
 
-import io.github.foundationgames.animatica.mixin.NativeImageAccessor;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.platform.NativeImage;
+import io.github.foundationgames.animatica.accessor.NativeImageAccessor;
+import net.minecraft.util.Mth;
 import org.lwjgl.system.MemoryUtil;
 
 public enum TextureUtil {;
@@ -21,11 +21,11 @@ public enum TextureUtil {;
      * @param dv The v coordinate on the destination image to place the selection at
      */
     public static void copy(NativeImage src, int u, int v, int w, int h, NativeImage dest, int du, int dv) {
-        w = MathHelper.clamp(dest.getWidth() - du, 0, w);
-        h = MathHelper.clamp(dest.getHeight() - dv, 0, h);
+        w = Mth.clamp(dest.getWidth() - du, 0, w);
+        h = Mth.clamp(dest.getHeight() - dv, 0, h);
 
-        long srcPtr = ((NativeImageAccessor)(Object)src).getPointer();
-        long dstPtr = ((NativeImageAccessor)(Object)dest).getPointer();
+        long srcPtr = ((NativeImageAccessor)(Object)src).animatica$getPixels();
+        long dstPtr = ((NativeImageAccessor)(Object)dest).animatica$getPixels();
 
         for (int row = 0; row < h; row++) {
             int srcRowIdx = ((v + row) * src.getWidth()) + u;
@@ -55,11 +55,11 @@ public enum TextureUtil {;
      *              second (0 = solid first image, 1 = solid second image)
      */
     public static void blendCopy(NativeImage src, int u0, int v0, int u1, int v1, int w, int h, NativeImage dest, int du, int dv, float blend) {
-        w = MathHelper.clamp(dest.getWidth() - du, 0, w);
-        h = MathHelper.clamp(dest.getHeight() - dv, 0, h);
+        w = Mth.clamp(dest.getWidth() - du, 0, w);
+        h = Mth.clamp(dest.getHeight() - dv, 0, h);
 
-        long srcPtr = ((NativeImageAccessor)(Object)src).getPointer();
-        long dstPtr = ((NativeImageAccessor)(Object)dest).getPointer();
+        long srcPtr = ((NativeImageAccessor)(Object)src).animatica$getPixels();
+        long dstPtr = ((NativeImageAccessor)(Object)dest).animatica$getPixels();
 
         for (int row = 0; row < h; row++) {
             int src0RowIdx = ((v0 + row) * src.getWidth()) + u0;
@@ -72,21 +72,21 @@ public enum TextureUtil {;
             var trgRow = MemoryUtil.memIntBuffer(dstPtr + (trgRowIdx * SIZEOF_INT), w);
 
             for (int col = 0; col < w; col++) {
-                trgRow.put(col, lerpColor(src.getFormat(), src0Row.get(col), src1Row.get(col), blend));
+                trgRow.put(col, lerpColor(src.format(), src0Row.get(col), src1Row.get(col), blend));
             }
         }
     }
 
     public static int lerpColor(NativeImage.Format format, int c1, int c2, float delta) {
-        int a1 = (c1 >> format.getAlphaOffset()) & 0xFF;
-        int r1 = (c1 >> format.getRedOffset()) & 0xFF;
-        int g1 = (c1 >> format.getGreenOffset()) & 0xFF;
-        int b1 = (c1 >> format.getBlueOffset()) & 0xFF;
+        int a1 = (c1 >> format.alphaOffset()) & 0xFF;
+        int r1 = (c1 >> format.redOffset()) & 0xFF;
+        int g1 = (c1 >> format.greenOffset()) & 0xFF;
+        int b1 = (c1 >> format.blueOffset()) & 0xFF;
 
-        int a2 = (c2 >> format.getAlphaOffset()) & 0xFF;
-        int r2 = (c2 >> format.getRedOffset()) & 0xFF;
-        int g2 = (c2 >> format.getGreenOffset()) & 0xFF;
-        int b2 = (c2 >> format.getBlueOffset()) & 0xFF;
+        int a2 = (c2 >> format.alphaOffset()) & 0xFF;
+        int r2 = (c2 >> format.redOffset()) & 0xFF;
+        int g2 = (c2 >> format.greenOffset()) & 0xFF;
+        int b2 = (c2 >> format.blueOffset()) & 0xFF;
 
         // If the first or second color is transparent,
         // don't lerp any leftover rgb values and instead
@@ -101,11 +101,11 @@ public enum TextureUtil {;
             b2 = b1;
         }
 
-        int oa = MathHelper.lerp(delta, a1, a2);
-        int or = MathHelper.lerp(delta, r1, r2);
-        int og = MathHelper.lerp(delta, g1, g2);
-        int ob = MathHelper.lerp(delta, b1, b2);
+        int oa = Mth.lerpInt(delta, a1, a2);
+        int or = Mth.lerpInt(delta, r1, r2);
+        int og = Mth.lerpInt(delta, g1, g2);
+        int ob = Mth.lerpInt(delta, b1, b2);
 
-        return (oa << format.getAlphaOffset()) | (or << format.getRedOffset()) | (og << format.getGreenOffset()) | (ob << format.getBlueOffset());
+        return (oa << format.alphaOffset()) | (or << format.redOffset()) | (og << format.greenOffset()) | (ob << format.blueOffset());
     }
 }

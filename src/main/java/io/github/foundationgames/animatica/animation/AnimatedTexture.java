@@ -1,15 +1,9 @@
 package io.github.foundationgames.animatica.animation;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.NativeImage;
 import io.github.foundationgames.animatica.Animatica;
 import io.github.foundationgames.animatica.util.TextureUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureTickListener;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -21,8 +15,14 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TickableTexture;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.Mth;
 
-public class AnimatedTexture extends NativeImageBackedTexture implements TextureTickListener {
+public class AnimatedTexture extends DynamicTexture implements TickableTexture {
     public static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(4);
 
     public final Animation[] anims;
@@ -32,7 +32,7 @@ public class AnimatedTexture extends NativeImageBackedTexture implements Texture
     private CompletableFuture<Void> frameWaitingOn = null;
 
     public static Optional<AnimatedTexture> tryCreate(ResourceManager resources, Identifier targetTexId, List<AnimationMeta> anims) {
-        try (var targetTexResource = resources.getResourceOrThrow(targetTexId).getInputStream()) {
+        try (var targetTexResource = resources.getResourceOrThrow(targetTexId).open()) {
             return Optional.of(new AnimatedTexture(targetTexId::toString, resources, anims, NativeImage.read(targetTexResource)));
         } catch (IOException e) { Animatica.LOG.error(e); }
 
@@ -48,7 +48,7 @@ public class AnimatedTexture extends NativeImageBackedTexture implements Texture
         }
         this.original = image;
 
-        updateAndDraw(this.getImage(), true, MinecraftClient.getInstance());
+        updateAndDraw(this.getPixels(), true, Minecraft.getInstance());
         this.upload();
     }
 
@@ -103,7 +103,7 @@ public class AnimatedTexture extends NativeImageBackedTexture implements Texture
                             TextureUtil.copy(anim.sourceTexture, 0, phase.v, anim.width, anim.height, image, anim.targetX, anim.targetY);
                         }
                     }
-                }, exec).thenAccept(v -> MinecraftClient.getInstance().execute(this::upload));
+                }, exec).thenAccept(v -> Minecraft.getInstance().execute(this::upload));
             }
         }
 
@@ -115,7 +115,7 @@ public class AnimatedTexture extends NativeImageBackedTexture implements Texture
 
     @Override
     public void tick() {
-        this.updateAndDraw(this.getImage(), false, EXECUTORS);
+        this.updateAndDraw(this.getPixels(), false, EXECUTORS);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class AnimatedTexture extends NativeImageBackedTexture implements Texture
             this.width = meta.width();
             this.height = meta.height();
 
-            try (var source = resources.getResourceOrThrow(meta.source()).getInputStream()) {
+            try (var source = resources.getResourceOrThrow(meta.source()).open()) {
                 this.sourceTexture = NativeImage.read(source);
             }
 
@@ -256,7 +256,7 @@ public class AnimatedTexture extends NativeImageBackedTexture implements Texture
         }
 
         private int getVForFrame(int frame, int textureFrameCount) {
-            return MathHelper.clamp(frame * this.height, 0, (textureFrameCount - 1) * this.height);
+            return Mth.clamp(frame * this.height, 0, (textureFrameCount - 1) * this.height);
         }
     }
 

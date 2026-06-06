@@ -26,9 +26,9 @@
     "animatica.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.11.3",
-    "fabric": "*",
-    "minecraft": ">=1.21.5",
+    "fabricloader": ">=0.18.4",
+    "fabric-api": "*",
+    "minecraft": ">=26.1-alpha.2",
     "java": ">=21"
   }
 }

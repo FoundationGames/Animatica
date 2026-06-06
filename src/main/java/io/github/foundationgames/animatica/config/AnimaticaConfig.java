@@ -2,8 +2,9 @@ package io.github.foundationgames.animatica.config;
 
 import io.github.foundationgames.animatica.Animatica;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.SimpleOption;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.network.chat.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,10 +13,11 @@ import java.util.Properties;
 
 public class AnimaticaConfig {
     public static String ANIMATED_TEXTURES_KEY = "animated_textures";
+    private static final Component GRAPHICS_TOOLTIP_ANIMATIONS = Component.translatable("options.animatica.animations.tooltip");
 
     public static final String FILE_NAME = "animatica.properties";
 
-    private final SimpleOption<Boolean> animatedTexturesOption;
+    private final OptionInstance<Boolean> animatedTexturesOption;
     public boolean animatedTextures;
 
     public AnimaticaConfig() {
@@ -25,15 +27,16 @@ public class AnimaticaConfig {
             Animatica.LOG.error("Error loading config during initialization!", e);
         }
 
-        this.animatedTexturesOption = SimpleOption.ofBoolean(
+        this.animatedTexturesOption = OptionInstance.createBoolean(
                 "option.animatica.animated_textures",
+                OptionInstance.cachedConstantTooltip(GRAPHICS_TOOLTIP_ANIMATIONS),
                 this.animatedTextures,
                 value -> {
                     this.animatedTextures = value;
                     try {
                         this.save();
                     } catch (IOException e) { Animatica.LOG.error("Error saving config while changing in game!", e); }
-                    MinecraftClient.getInstance().reloadResources();
+                    Minecraft.getInstance().reloadResourcePacks();
                 }
         );
     }
@@ -55,7 +58,7 @@ public class AnimaticaConfig {
         return file;
     }
 
-    public SimpleOption<Boolean> getAnimatedTexturesOption() {
+    public OptionInstance<Boolean> getAnimatedTexturesOption() {
         return animatedTexturesOption;
     }
 

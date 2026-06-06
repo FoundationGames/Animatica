@@ -1,6 +1,6 @@
 package io.github.foundationgames.animatica.util.exception;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class InvalidPropertyException extends PropertyParseException {
     public InvalidPropertyException(Identifier file, String key, String expectedType) {

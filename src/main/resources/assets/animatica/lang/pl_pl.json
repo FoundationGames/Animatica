@@ -1,3 +1,4 @@
 {
-    "option.animatica.animated_textures": "Niestandardowe animacje"
+    "option.animatica.animated_textures": "Niestandardowe animacje",
+    "options.animatica.animations.tooltip": "Przełącza widoczność niestandardowych animacji za pomocą Animatica."
 }
